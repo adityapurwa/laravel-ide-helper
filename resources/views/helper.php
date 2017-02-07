@@ -7,21 +7,21 @@
  * @author Barry vd. Heuvel <barryvdh@gmail.com>
  * @see https://github.com/barryvdh/laravel-ide-helper
  */
+namespace  {
+    exit("This file should not be included, only analyzed by your IDE");
+}
 
 <?php foreach($namespaces as $namespace => $aliases): ?>
-namespace <?= $namespace == '__root' ? '' : $namespace ?>{
-<?php if($namespace == '__root'): ?>
-    exit("This file should not be included, only analyzed by your IDE");
-<?= $helpers ?>
-<?php endif; ?>
+namespace <?= $namespace == '__root' ? '' : trim($namespace, '\\') ?> {
 <?php foreach($aliases as $alias): ?>
 
-    <?= $alias->getClassType() ?> <?= $alias->getShortName() ?> <?= $alias->getExtends() ? 'extends ' . $alias->getExtends() : '' ?>{
+    <?= $alias->getClassType() ?> <?= $alias->getShortName() ?> {
         <?php foreach($alias->getMethods() as $method): ?>
 
         <?= trim($method->getDocComment('        ')) ?>
 
-        public static function <?= $method->getName() ?>(<?= $method->getParamsWithDefault() ?>){<?php if($method->getDeclaringClass() !== $method->getRoot()): ?>
+        public static function <?= $method->getName() ?>(<?= $method->getParamsWithDefault() ?>)
+        {<?php if($method->getDeclaringClass() !== $method->getRoot()): ?>
 
             //Method inherited from <?= $method->getDeclaringClass() ?>
             <?php endif; ?>
@@ -30,14 +30,22 @@ namespace <?= $namespace == '__root' ? '' : $namespace ?>{
         }
         <?php endforeach; ?>
 
-    }
-
+    }         
 <?php endforeach; ?>
-
 }
-
+    
 <?php endforeach; ?>
+    
+namespace {
+<?= $helpers ?>
 
+<?php foreach($namespaces as $namespace => $aliases): ?>
+<?php foreach($aliases as $alias): ?>
+    <?= $alias->getClassType() ?> <?= $alias->getShortName() ?> extends <?= $alias->getExtends() ?> {}
+    
+<?php endforeach; ?>
+<?php endforeach; ?>
+}
 
 <?php if($include_fluent): ?>
 namespace Illuminate\Support {
